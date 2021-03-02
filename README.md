@@ -1,5 +1,7 @@
 # Jest tests for ctez token
 
+##### To start: `npm install && npm start-sandbox && npm run test`
+
 ## Contract structure and test plan:
 
 ### Entrypoints:
@@ -75,7 +77,7 @@
     - [ ] if CASH_IS_FA12 `match Tezos.get_entrypoint_opt "%getBalance" storage.cashAddress with None error_INVALID_FA12_CASH_CONTRACT_MISSING_GETBALANCE`
     - [ ] if CASH_IS_FA2 `match Tezos.get_entrypoint_opt "%balance_of" storage.cashAddress with None error_INVALID_FA2_CASH_CONTRACT_MISSING_GETBALANCE`
 - **UpdateTokenPoolInternal**
-  - [Parameters: if TOKEN_IS_FA2 nat else ((address _ nat) _ nat) list](https://)
+  - [Parameters: if TOKEN*IS_FA2 nat else ((address * nat) \_ nat) list](https://)
   - Storage output: { storage with tokenPool ; pendingPoolUpdates }
   - Operation emitting: 0
   - Failwith:
@@ -119,7 +121,7 @@ _if HAS_BAKER_
 _if !CASH_IS_TEZ_
 
 - **UpdateCashPoolInternal**
-  - [Parameters: if CASH_IS_FA2 nat else if CASH_IS_FA12 ((address _ nat) _ nat) list](https://github.com/murbard/ctez/blob/main/cfmm.mligo#L84)
+  - [Parameters: if CASH*IS_FA2 nat else if CASH_IS_FA12 ((address * nat) \_ nat) list](https://github.com/murbard/ctez/blob/main/cfmm.mligo#L84)
   - Storage output: { storage with cashPool ; pendingPoolUpdates }
   - Operation emitting: 0
   - Failwith:
