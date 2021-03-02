@@ -1,6 +1,6 @@
 # Jest tests for ctez token
 
-##### To start: `npm install && npm start-sandbox && npm run test`
+##### To start: `npm install && npm run start-sandbox && npm run test`
 
 ## Contract structure and test plan:
 
