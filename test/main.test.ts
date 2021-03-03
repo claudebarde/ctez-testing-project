@@ -10,7 +10,15 @@ let Tezos: TezosToolkit;
 beforeAll(async () => {
   Tezos = new TezosToolkit(rpcUrl);
   const signer = new InMemorySigner(alice.sk);
-  Tezos.setSignerProvider(signer);
+  Tezos.setProvider({
+    signer,
+    config: {
+      confirmationPollingIntervalSecond: 1,
+      confirmationPollingTimeoutSecond: 20,
+      defaultConfirmationCount: 1,
+      shouldObservableSubscriptionRetry: true
+    }
+  });
 
   jest.setTimeout(20000);
 });
@@ -21,11 +29,11 @@ describe("Initial settings", () => {
 
     const aliceBalance = await Tezos.tz.getBalance(alice.pkh);
     const bobBalance = await Tezos.tz.getBalance(bob.pkh);
+    console.log(aliceBalance.toNumber(), bobBalance.toNumber());
 
     expect(aliceBalance.toNumber()).not.toBeUndefined();
     expect(aliceBalance.toNumber()).toBeLessThanOrEqual(initialBalance);
     expect(bobBalance.toNumber()).toBeGreaterThanOrEqual(initialBalance);
-    console.log(aliceBalance.toNumber(), bobBalance.toNumber());
   });
 
   test("Sends 1 tez from Alice to Bob", async () => {
@@ -36,7 +44,7 @@ describe("Initial settings", () => {
       const op = await Tezos.contract.transfer({ to: bob.pkh, amount: 1 });
       opHash = op.hash;
       const result = await op.confirmation();
-      console.log(result);
+      console.log("op result:", result);
     } catch (error) {
       console.log(error);
     }
