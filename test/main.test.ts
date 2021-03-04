@@ -1,26 +1,16 @@
-import { url, port, accounts } from "../taquitest.config";
+import { accounts, timeout } from "../taquitest.config";
 import { TezosToolkit } from "@taquito/taquito";
-import { InMemorySigner } from "@taquito/signer";
+import init from "../config/init";
 
-const rpcUrl = `${url}:${port}`;
 const { alice, bob } = accounts;
-
 let Tezos: TezosToolkit;
 
 beforeAll(async () => {
-  Tezos = new TezosToolkit(rpcUrl);
-  const signer = new InMemorySigner(alice.sk);
-  Tezos.setProvider({
-    signer,
-    config: {
-      confirmationPollingIntervalSecond: 1,
-      confirmationPollingTimeoutSecond: 20,
-      defaultConfirmationCount: 1,
-      shouldObservableSubscriptionRetry: true
-    }
-  });
+  const { tezos } = await init();
+  expect(tezos).not.toBeNull();
+  Tezos = tezos;
 
-  jest.setTimeout(20000);
+  jest.setTimeout(timeout * 1000);
 });
 
 describe("Initial settings", () => {
@@ -29,7 +19,7 @@ describe("Initial settings", () => {
 
     const aliceBalance = await Tezos.tz.getBalance(alice.pkh);
     const bobBalance = await Tezos.tz.getBalance(bob.pkh);
-    console.log(aliceBalance.toNumber(), bobBalance.toNumber());
+    //console.log(aliceBalance.toNumber(), bobBalance.toNumber());
 
     expect(aliceBalance.toNumber()).not.toBeUndefined();
     expect(aliceBalance.toNumber()).toBeLessThanOrEqual(initialBalance);
@@ -43,8 +33,7 @@ describe("Initial settings", () => {
     try {
       const op = await Tezos.contract.transfer({ to: bob.pkh, amount: 1 });
       opHash = op.hash;
-      const result = await op.confirmation();
-      console.log("op result:", result);
+      await op.confirmation();
     } catch (error) {
       console.log(error);
     }
@@ -56,3 +45,5 @@ describe("Initial settings", () => {
     );
   });
 });
+
+//describe("Deploy the contract", async () => {});
