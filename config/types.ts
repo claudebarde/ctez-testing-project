@@ -4,5 +4,6 @@ export interface InitReturn {
   success: boolean;
   tezos: TezosToolkit | null;
   changeSigner: (tezos: TezosToolkit, sk: string) => TezosToolkit | string;
+  contracts: any[];
   errorMsg?: string;
 }

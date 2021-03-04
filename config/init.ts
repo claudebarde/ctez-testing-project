@@ -3,10 +3,10 @@ import { InMemorySigner } from "@taquito/signer";
 import isOnline from "is-online";
 import axios from "axios";
 import chalk from "chalk";
-import { url, port, accounts, timeout } from "../taquitest.config";
 import { sh } from "../utils/utils";
 import { InitReturn } from "./types";
 import originateContracts from "./originateContracts";
+const { url, port, accounts, timeout } = require("../taquitest.config");
 
 const rpcUrl = `${url}:${port}`;
 const { alice } = accounts;
@@ -68,16 +68,16 @@ const init = async (): Promise<InitReturn> => {
       );
     }
     // originates contracts
-    process.stdout.write(chalk.blue("    - Originating the contracts\n"));
-    originateContracts(tezos);
+    process.stdout.write(chalk.blue("    - Originating the contracts...\n"));
+    const contracts = await originateContracts(tezos);
 
-    process.stdout.write("\n\n");
-
-    return { success: true, tezos, changeSigner };
+    if (Array.isArray(contracts)) {
+      return { success: true, tezos, changeSigner, contracts };
+    } else {
+      throw contracts;
+    }
   } catch (error) {
-    process.stdout.write("\n\n");
-
-    return { success: true, tezos: null, changeSigner };
+    return { success: true, tezos: null, changeSigner, contracts: [] };
   }
 };
 
