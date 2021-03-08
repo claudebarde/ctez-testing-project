@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   url: "http://localhost",
   port: "20000",
   accounts: {

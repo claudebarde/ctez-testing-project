@@ -1,9 +1,16 @@
-import { TezosToolkit } from "@taquito/taquito";
+import {
+  TezosToolkit,
+  ContractAbstraction,
+  ContractProvider
+} from "@taquito/taquito";
+
+export interface ContractOriginationInfo {
+  name: string;
+  contract: ContractAbstraction<ContractProvider>;
+}
 
 export interface InitReturn {
   success: boolean;
-  tezos: TezosToolkit | null;
-  changeSigner: (tezos: TezosToolkit, sk: string) => TezosToolkit | string;
-  contracts: any[];
+  contracts: ContractOriginationInfo[];
   errorMsg?: string;
 }

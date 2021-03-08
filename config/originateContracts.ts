@@ -1,14 +1,14 @@
 import fs from "fs";
 import path from "path";
-import {
-  TezosToolkit,
-  ContractAbstraction,
-  ContractProvider
-} from "@taquito/taquito";
+import { TezosToolkit } from "@taquito/taquito";
 import chalk from "chalk";
 import { sh } from "../utils/utils";
+import { ContractOriginationInfo } from "./types";
 
-const originate = async (file: string, tezos: TezosToolkit) => {
+const originate = async (
+  file: string,
+  tezos: TezosToolkit
+): Promise<ContractOriginationInfo> => {
   // fetches the contract details
   const contractToOriginate = (
     await import(path.join(__dirname, "../originators", file))
@@ -22,7 +22,11 @@ const originate = async (file: string, tezos: TezosToolkit) => {
     !contractToOriginate.hasOwnProperty("entrypoint") ||
     typeof contractToOriginate.entrypoint !== "string"
   ) {
-    throw "Invalid contract properties";
+    throw `Invalid contract properties: ${path.join(
+      __dirname,
+      "../originators",
+      file
+    )}-${JSON.stringify(contractToOriginate)}`;
   } else {
     // compiles contract with Ligo
     const { stdout: michelson, stderr: compileError } = await sh(
@@ -59,17 +63,24 @@ const originate = async (file: string, tezos: TezosToolkit) => {
         )
       );
 
-      return await op.contract();
+      const contractAbstraction = await op.contract();
+
+      return {
+        name: contractToOriginate.name.replace(".", "_"),
+        contract: contractAbstraction
+      };
     }
   }
 };
 
-export default async (tezos: TezosToolkit): Promise<any[] | string> => {
+export default async (
+  tezos: TezosToolkit
+): Promise<ContractOriginationInfo[] | string> => {
   try {
     // gets all the files in the originators folder
     const files = fs.readdirSync(path.join(__dirname, "../originators"));
     if (files && Array.isArray(files) && files.length > 0) {
-      const contractPromises: any[] = [];
+      const contractPromises: Promise<ContractOriginationInfo>[] = [];
       files.forEach(async file => {
         if (/origin_[a-z0-9-_]+\.[tj]s/.test(file)) {
           contractPromises.push(originate(file, tezos));
