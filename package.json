@@ -5,7 +5,10 @@
   "main": "index.ts",
   "type": "module",
   "scripts": {
-    "test": "jest"
+    "test": "jest",
+    "start-sandbox": "docker run --rm --name taquitest-sandbox --detach -p 20000:20000 tqtezos/flextesa:20210216 edobox start",
+    "kill-sandbox": "docker kill taquitest-sandbox",
+    "restart-sandbox": "npm run kill-sandbox && npm run start-sandbox"
   },
   "repository": {
     "type": "git",
