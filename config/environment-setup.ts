@@ -6,6 +6,11 @@ import { sh } from "../utils/utils";
 import originateContracts from "./originateContracts";
 import type { InitReturn } from "./types";
 
+let tezos: TezosToolkit;
+const { url, port, accounts, timeout } = config;
+const { alice } = accounts;
+const rpcUrl = `${url}:${port}`;
+
 process.stdout.write(chalk.blue("    Starting setup...\n"));
 
 const changeSigner = (
@@ -22,7 +27,7 @@ const changeSigner = (
   }
 };
 
-const init = async (): InitReturn => {
+const init = async (): Promise<InitReturn | undefined> => {
   const { Tezos } = global;
 
   try {
@@ -40,7 +45,7 @@ const init = async (): InitReturn => {
     process.stdout.write(chalk.blue("    - Originating the contracts...\n"));
     const contracts = await originateContracts(tezos);
     if (Array.isArray(contracts)) {
-      return { success: true, contracts };
+      return { success: true, rpcUrl, contracts };
     } else {
       throw contracts;
     }
@@ -48,11 +53,6 @@ const init = async (): InitReturn => {
     console.error(error);
   }
 };
-
-let tezos: TezosToolkit;
-const { url, port, accounts, timeout } = config;
-const { alice } = accounts;
-const rpcUrl = `${url}:${port}`;
 
 // sets up Tezos Toolkit
 tezos = new TezosToolkit(rpcUrl);

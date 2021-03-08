@@ -67,6 +67,7 @@ const originate = async (
 
       return {
         name: contractToOriginate.name.replace(".", "_"),
+        address: op.contractAddress,
         contract: contractAbstraction
       };
     }
